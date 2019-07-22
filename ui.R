@@ -16,9 +16,11 @@ shinyUI(fluidPage(
   
   fluidRow(
     column(2,textInput("surveyInput",label="Survey",value="IE-IGFS")),
-    column(1,textInput("haulInput",label="Haul",value="94")),
+    #column(1,textInput("haulInput",label="Haul",value="94")),
+    column(2,selectInput("haulInput",label="Haul",choices= c("Any"="Any"))),
     column(2,textInput("speciesInput",label="Species",value="127146")),
-    column(2,textInput("sexInput",label="Sex",value="F"))
+    #column(2,textInput("sexInput",label="Sex",value="F"))
+    column(2,selectInput("sexInput",label="Sex",choices= c("Any"="Any","Female"= "F", "Male" = "M", "Unidentified" = "U")))
 
   ),
   

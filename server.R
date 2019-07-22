@@ -18,6 +18,7 @@ shinyServer(function(input, output, session) {
   myCA <- myAllData[["CA"]]
   myHH <- myAllData[["HH"]]
   
+  updateSelectInput(session, "haulInput", label = NULL, choices = c("Any"="Any",sort(unique(myHL$HaulNo))) ,selected = NULL)
 
  myOutput$plotData <- myHL
  
@@ -40,7 +41,9 @@ shinyServer(function(input, output, session) {
     
     HLtoUse <- myOutput$plotData
     
-    myRecords <- HLtoUse[HLtoUse$Survey == mySurvey & HLtoUse$HaulNo==myHaul & HLtoUse$Valid_Aphia==mySpecies & HLtoUse$Sex==mySex,]
+    #myRecords <- HLtoUse[HLtoUse$Survey == mySurvey & HLtoUse$HaulNo==myHaul & HLtoUse$Valid_Aphia==mySpecies & HLtoUse$Sex==mySex,]
+    
+    myRecords <- FilterHLData(HL=HLtoUse, Survey= mySurvey, Species=mySpecies, Haul=myHaul, Sex=mySex, Length=DefaultText)
     
     if(!is.null(myRecords)){
       
@@ -76,16 +79,21 @@ shinyServer(function(input, output, session) {
     myHaul <- input$haulInput
     mySex <- input$sexInput
 
-
-    if (length(myLength)>0 & !is.na(as.numeric(myLength))){
+    # If we haven't the filtered the data properly then don't go any further
+    if (mySurvey==DefaultText | mySpecies==DefaultText | myHaul == DefaultText | mySex == DefaultText){
+      myOutput$description <- "You can't update lengths unless you have selected values for all the filters first"
+    } 
+    # else check if we have an actual number and try and proceed
+    else if (length(myLength)>0 & !is.na(as.numeric(myLength))){
       
       # Convert cm to mm
       myLength <- as.numeric(input$lengthInput) * 10
       
       HLtoUse <- myOutput$plotData
       
-
-      myLengthRecords <- HLtoUse[HLtoUse$Survey == mySurvey & HLtoUse$HaulNo==myHaul & HLtoUse$Valid_Aphia==mySpecies & HLtoUse$Sex==mySex & HLtoUse$LngtClas==myLength,]
+      #myLengthRecords <- HLtoUse[HLtoUse$Survey == mySurvey & HLtoUse$HaulNo==myHaul & HLtoUse$Valid_Aphia==mySpecies & HLtoUse$Sex==mySex & HLtoUse$LngtClas==myLength,]
+      
+      myLengthRecords <- FilterHLData(HL=HLtoUse, Survey= mySurvey, Species=mySpecies, Haul=myHaul, Sex=mySex, Length=myLength)
       
 
       if (NROW(myLengthRecords)==1){
@@ -104,7 +112,9 @@ shinyServer(function(input, output, session) {
         myOutput$description <- paste("Length doesn't exist - creating new entry for:",myLength)
         
         
-        RecordToDuplicate <- HLtoUse[HLtoUse$Survey == mySurvey & HLtoUse$HaulNo==myHaul & HLtoUse$Valid_Aphia==mySpecies & HLtoUse$Sex==mySex,]
+        #RecordToDuplicate <- HLtoUse[HLtoUse$Survey == mySurvey & HLtoUse$HaulNo==myHaul & HLtoUse$Valid_Aphia==mySpecies & HLtoUse$Sex==mySex,]
+        
+        RecordToDuplicate <- FilterHLData(HL=HLtoUse, Survey= mySurvey, Species=mySpecies, Haul=myHaul, Sex=mySex, Length=DefaultText)
         
         if (NROW(RecordToDuplicate)>=1){
 
