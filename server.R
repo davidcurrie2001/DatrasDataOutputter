@@ -128,13 +128,20 @@ shinyServer(function(input, output, session) {
           RecordToDuplicate$HLNoAtLngt <- 1
           
           dataToSave <- rbind(HLtoUse,RecordToDuplicate)
-          
-          myAllData[["HL"]] <- dataToSave
-          
+
           myOutput$plotData <- dataToSave
           
+
+          # Remove columns tha aren't in the exchange data
+          trimmedRecord <- subset(RecordToDuplicate, select = -c(haul.id,LngtCm,Species,HaulDur,DataType,Count) )
+          
+          
+          write.table(trimmedRecord, file= "data/DATRAS_Exchange_Data_Mod.csv", sep=",", append=TRUE,quote=FALSE, row.names=FALSE, col.names = FALSE)
+          
+          #cat(RecordToDuplicate, file= "data/DATRAS_Exchange_Data_Mod.csv", sep=",", append=TRUE)
+          
           # Save the new data
-          write.csv(myAllData, file= AllDataFile)
+          #write.csv(toSave, file= "data/DATRAS_Exchange_Data_Mod.csv")
           
         }
         
