@@ -8,38 +8,29 @@ DefaultText <- "Any"
 AllDataFile <- "data/DATRAS_Exchange_Data.csv"
 myFilters <- "data/myFilters.csv"
 
-# Use the filters on the data supplied
-FilterData<-function(allData,filtersToUse){
+# Save to the DATRAS exchange format
+saveDatras <- function(HHtoSave, HLtoSave, CAtoSave, filename){
   
-  # Filter the data using the selected values
-  filteredData <- allData
-  
-  # Try and filter the data by all vlaues in filtersToUse 
-  for (i in colnames(filtersToUse)){
-    filteredData <- filterDataByParameter(filteredData,filtersToUse,i)
-  }
-  
-  filteredData
-  
-}
 
-# Use the filter values to subset the DATRAS data
-filterDataByParameter <- function(dataToFilter,filtersToUse,paramName){
+  # Try and remove any added columns
+  HHcolsToRemove <- list("haul.id","Abstime","TimeOfYear","TimeShotHour","Lon","Lat","Roundfish","abstime","timeOfYear","lon","lat")
+  HHtoSave <- HHtoSave[, !(names(HHtoSave) %in%  HHcolsToRemove)]
   
-  selectedValue <- ''
-  dataToReturn <- dataToFilter
+  HLcolsToRemove <- list("haul.id","LngtCm","Species","HaulDur","DataType","Count")
+  HLtoSave <- HLtoSave[, !(names(HLtoSave) %in%  HLcolsToRemove)]
   
-  if (paramName %in% colnames(filtersToUse)){
-    selectedValue <- as.character(filtersToUse[1,paramName])
-    if (selectedValue != DefaultText){
-      
-      conditionToCheck <- paste("dataToReturn <- subset.DATRASraw(dataToFilter,",paramName,"=='",selectedValue, "')",sep = "")
-      #print(conditionToCheck)
-      # Need to use eval and parse so we can dynamically build the command, otherwise the values passed to ... in the subset.DATRASraw 
-      # function will be taken literally
-      eval(parse(text=conditionToCheck))
-    }
-  }
+  CAcolsToRemove <- list("haul.id","StatRec","LngtCm","Species")
+  CAtoSave <- CAtoSave[, !(names(CAtoSave) %in%  CAcolsToRemove)]
   
-  dataToReturn
+  # HH
+  write.table(HHtoSave, file= filename, sep=",", append=FALSE,quote=FALSE, row.names=FALSE, col.names = TRUE)
+  
+  # HL
+  write.table(HLtoSave, file= filename, sep=",", append=TRUE,quote=FALSE, row.names=FALSE, col.names = TRUE)
+ 
+  # CA
+  write.table(CAtoSave, file= filename, sep=",", append=TRUE,quote=FALSE, row.names=FALSE, col.names = TRUE)
+  
+  
+   
 }

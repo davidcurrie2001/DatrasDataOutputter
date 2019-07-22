@@ -15,15 +15,19 @@ shinyServer(function(input, output, session) {
   
   myAllData <- readICES(AllDataFile ,strict=FALSE)
   myHL <- myAllData[["HL"]]
+  myCA <- myAllData[["CA"]]
+  myHH <- myAllData[["HH"]]
   
 
  myOutput$plotData <- myHL
  
  myOutput$description <- "Data loaded"
   
-  output$myResults <- renderText({
+  output$myResults <- renderText ({
     
-    myOutput$description
+    paste('<strong style="color: red;">',myOutput$description,'</strong>',sep='')
+    
+
   })
   
   output$mainPlot <- renderPlotly({
@@ -52,8 +56,17 @@ shinyServer(function(input, output, session) {
     
   })
   
-
-  observeEvent(input$action, {
+  # Save the data to the Exchange format cvs file
+  observeEvent(input$save, {
+    
+    saveDatras(HHtoSave=myHH, HLtoSave=myOutput$plotData, CAtoSave=myCA, filename="data/DATRAS_Exchange_Data.csv")
+    
+    myOutput$description <- "Data saved"
+    
+  })
+  
+  # Record the measurement
+  observeEvent(input$go, {
     
     myOutput$data <- input$lengthInput
 
@@ -69,47 +82,26 @@ shinyServer(function(input, output, session) {
       # Convert cm to mm
       myLength <- as.numeric(input$lengthInput) * 10
       
-      #HL <- allData[["HL"]]
-      #mySurvey <- "IE-IGFS"
-      #mySpecies <- 127146
-      #myHaul <- 94
-      #mySex <- "F"
-      #myLength <- as.numeric("28") * 10
-      
       HLtoUse <- myOutput$plotData
       
-      #myLengthRecords <- myHL[myHL$Survey == mySurvey & myHL$HaulNo==myHaul & myHL$Valid_Aphia==mySpecies & myHL$Sex==mySex & myHL$LngtClas==myLength,]
+
       myLengthRecords <- HLtoUse[HLtoUse$Survey == mySurvey & HLtoUse$HaulNo==myHaul & HLtoUse$Valid_Aphia==mySpecies & HLtoUse$Sex==mySex & HLtoUse$LngtClas==myLength,]
       
-      #myLengthRecords <- HL()[HL()$Survey == mySurvey & HL()$HaulNo==myHaul & HL()$Valid_Aphia==mySpecies & HL()$Sex==mySex & HL()$LngtClas==myLength,]
-      
-      
+
       if (NROW(myLengthRecords)==1){
-        myOutput$description <- paste("Length already exists:",myLength)
+        myOutput$description <- paste("Length already exists - appending to:",myLength)
         
         myCount <- myLengthRecords$HLNoAtLngt
-        
-
-        #myHL[myHL$Survey == mySurvey & myHL$HaulNo==myHaul & myHL$Valid_Aphia==mySpecies & myHL$Sex==mySex & myHL$LngtClas==myLength,"HLNoAtLngt"]<-myCount+1
         
         HLtoUse[HLtoUse$Survey == mySurvey & HLtoUse$HaulNo==myHaul & HLtoUse$Valid_Aphia==mySpecies & HLtoUse$Sex==mySex & HLtoUse$LngtClas==myLength,"HLNoAtLngt"]<-myCount+1
         
         myOutput$plotData <- HLtoUse
         
+        myHL <- HLtoUse
         
-        myAllData[["HL"]] <- HLtoUse
-        
-        # Save the new data
-        write.csv(myAllData, file= AllDataFile)
-        
-        #myOutput$plotData <- myHL[myHL$Survey == mySurvey & myHL$HaulNo==myHaul & myHL$Valid_Aphia==mySpecies & myHL$Sex==mySex,]
-        
-        
-        #myCount <- HL()[HL()$Survey == mySurvey & HL()$HaulNo==myHaul & HL()$Valid_Aphia==mySpecies & HL()$Sex==mySex & HL()$LngtClas==myLength,"HLNoAtLngt"]
-        #HL()[HL()$Survey == mySurvey & HL()$HaulNo==myHaul & HL()$Valid_Aphia==mySpecies & HL()$Sex==mySex & HL()$LngtClas==myLength,"HLNoAtLngt"] <- myCount + 1
         
       } else {
-        myOutput$description <- paste("Length doesn't exist:",myLength)
+        myOutput$description <- paste("Length doesn't exist - creating new entry for:",myLength)
         
         
         RecordToDuplicate <- HLtoUse[HLtoUse$Survey == mySurvey & HLtoUse$HaulNo==myHaul & HLtoUse$Valid_Aphia==mySpecies & HLtoUse$Sex==mySex,]
@@ -131,17 +123,7 @@ shinyServer(function(input, output, session) {
 
           myOutput$plotData <- dataToSave
           
-
-          # Remove columns tha aren't in the exchange data
-          trimmedRecord <- subset(RecordToDuplicate, select = -c(haul.id,LngtCm,Species,HaulDur,DataType,Count) )
-          
-          
-          write.table(trimmedRecord, file= "data/DATRAS_Exchange_Data_Mod.csv", sep=",", append=TRUE,quote=FALSE, row.names=FALSE, col.names = FALSE)
-          
-          #cat(RecordToDuplicate, file= "data/DATRAS_Exchange_Data_Mod.csv", sep=",", append=TRUE)
-          
-          # Save the new data
-          #write.csv(toSave, file= "data/DATRAS_Exchange_Data_Mod.csv")
+          myHL <- dataToSave
           
         }
         
