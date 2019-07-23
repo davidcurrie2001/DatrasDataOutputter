@@ -1,6 +1,7 @@
 library(shiny)
 library(DATRAS)
 library(plotly)
+library(data.table)
 
 DefaultText <- "Any"
 
@@ -25,13 +26,16 @@ saveDatras <- function(HHtoSave, HLtoSave, CAtoSave, filename){
   CAtoSave <- CAtoSave[, !(names(CAtoSave) %in%  CAcolsToRemove)]
   
   # HH
-  write.table(HHtoSave, file= filename, sep=",", append=FALSE,quote=FALSE, row.names=FALSE, col.names = TRUE)
+  #write.table(HHtoSave, file= filename, sep=",", append=FALSE,quote=FALSE, row.names=FALSE, col.names = TRUE)
+  fwrite(HHtoSave, file= filename, sep=",", append=FALSE,quote=FALSE, row.names=FALSE, col.names = TRUE)
   
   # HL
-  write.table(HLtoSave, file= filename, sep=",", append=TRUE,quote=FALSE, row.names=FALSE, col.names = TRUE)
+  #write.table(HLtoSave, file= filename, sep=",", append=TRUE,quote=FALSE, row.names=FALSE, col.names = TRUE)
+  fwrite(HLtoSave, file= filename, sep=",", append=TRUE,quote=FALSE, row.names=FALSE, col.names = TRUE)
  
   # CA
-  write.table(CAtoSave, file= filename, sep=",", append=TRUE,quote=FALSE, row.names=FALSE, col.names = TRUE)
+  #write.table(CAtoSave, file= filename, sep=",", append=TRUE,quote=FALSE, row.names=FALSE, col.names = TRUE)
+  fwrite(CAtoSave, file= filename, sep=",", append=TRUE,quote=FALSE, row.names=FALSE, col.names = TRUE)
   
    
 }

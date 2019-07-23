@@ -28,8 +28,8 @@ shinyUI(fluidPage(
     column(2,textInput("lengthInput",label="Length (cm)"))
   ),
   fluidRow(
-    column(2,actionButton("go", label = "Go")),
-    column(2,actionButton("save", label = "Save"))
+    column(2,actionButton("go", label = "Go"))
+    #column(2,actionButton("save", label = "Save"))
   ),
   fluidRow(
     column(12,htmlOutput("myResults"))

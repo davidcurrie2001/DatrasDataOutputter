@@ -60,13 +60,13 @@ shinyServer(function(input, output, session) {
   })
   
   # Save the data to the Exchange format cvs file
-  observeEvent(input$save, {
-    
-    saveDatras(HHtoSave=myHH, HLtoSave=myOutput$plotData, CAtoSave=myCA, filename="data/DATRAS_Exchange_Data.csv")
-    
-    myOutput$description <- "Data saved"
-    
-  })
+  # observeEvent(input$save, {
+  #   
+  #   saveDatras(HHtoSave=myHH, HLtoSave=myOutput$plotData, CAtoSave=myCA, filename=AllDataFile)
+  #   
+  #   myOutput$description <- "Data saved"
+  #   
+  # })
   
   # Record the measurement
   observeEvent(input$go, {
@@ -107,6 +107,8 @@ shinyServer(function(input, output, session) {
         
         myHL <- HLtoUse
         
+        saveDatras(HHtoSave=myHH, HLtoSave=myOutput$plotData, CAtoSave=myCA, filename=AllDataFile)
+        
         
       } else {
         myOutput$description <- paste("Length doesn't exist - creating new entry for:",myLength)
@@ -134,6 +136,8 @@ shinyServer(function(input, output, session) {
           myOutput$plotData <- dataToSave
           
           myHL <- dataToSave
+          
+          saveDatras(HHtoSave=myHH, HLtoSave=myOutput$plotData, CAtoSave=myCA, filename=AllDataFile)
           
         }
         
