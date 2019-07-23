@@ -27,6 +27,7 @@ shinyServer(function(input, output, session) {
   updateSelectInput(session, "haulInput", label = NULL, choices = c("Any"="Any",sort(unique(as.character(myHL$HaulNo)))) ,selected = NULL)
 
   # Species
+  specCount<- aggregate(haul.id~Valid_Aphia + ScientificName_WoRMS, data=myHL,  FUN=length)
   specChoices <- specCount[specCount$haul.id>500,c("Valid_Aphia","ScientificName_WoRMS")]
   choices = setNames(specChoices$Valid_Aphia,specChoices$ScientificName_WoRMS)
   updateSelectInput(session, "speciesInput", label=NULL, choices = choices, selected=NULL)
@@ -96,14 +97,15 @@ shinyServer(function(input, output, session) {
     mySex <- input$sexInput
 
     # If we haven't the filtered the data properly then don't go any further
-    if (mySurvey==DefaultText | mySpecies==DefaultText | myHaul == DefaultText | mySex == DefaultText){
+    if (mySurvey==DefaultText | mySpecies==DefaultText | myHaul == DefaultText | mySex == DefaultText | myYear == DefaultText){
       myOutput$description <- "You can't update lengths unless you have selected values for all the filters first"
     } 
     # else check if we have an actual number and try and proceed
     else if (length(myLength)>0 & !is.na(as.numeric(myLength))){
       
-      # Convert cm to mm
-      myLength <- as.numeric(input$lengthInput) * 10
+      
+      #myLength <- as.numeric(input$lengthInput) * 10
+      myLength <- as.numeric(input$lengthInput)
       
       HLtoUse <- myOutput$plotData
       
@@ -116,8 +118,8 @@ shinyServer(function(input, output, session) {
         myOutput$description <- paste("Length already exists - appending to:",myLength)
         
         myCount <- myLengthRecords$HLNoAtLngt
-        
-        HLtoUse[HLtoUse$Survey == mySurvey & HLtoUse$HaulNo==myHaul & HLtoUse$Valid_Aphia==mySpecies & HLtoUse$Sex==mySex & HLtoUse$LngtClas==myLength,"HLNoAtLngt"]<-myCount+1
+
+        HLtoUse[HLtoUse$Survey == mySurvey & HLtoUse$HaulNo==myHaul & HLtoUse$Valid_Aphia==mySpecies & NAsAsMinus9(HLtoUse$Sex)==mySex & HLtoUse$LngtClas==myLength,"HLNoAtLngt"]<-myCount+1
         
         myOutput$plotData <- HLtoUse
         

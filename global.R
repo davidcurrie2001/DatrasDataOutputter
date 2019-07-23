@@ -14,6 +14,9 @@ saveDatras <- function(HHtoSave, HLtoSave, CAtoSave, filename){
   
   ## TODO: we might need to convert NAs into -9s before we save the data
   
+  # Convert NAs to -9 for HL$Sex
+  HLtoSave$Sex <- NAsAsMinus9(HLtoSave$Sex)
+  
 
   # Try and remove any added columns
   HHcolsToRemove <- list("haul.id","Abstime","TimeOfYear","TimeShotHour","Lon","Lat","Roundfish","abstime","timeOfYear","lon","lat")
@@ -61,7 +64,8 @@ FilterHLData <- function(HL, Year, Survey, Species, Haul, Sex, Length){
   }
   
   if (Sex != DefaultText){
-    HLoutput <- HLoutput[HLoutput$Sex == Sex,]
+    #HLoutput <- HLoutput[HLoutput$Sex == Sex,]
+    HLoutput <- HLoutput[NAsAsMinus9(HLoutput$Sex) == Sex,]
   }
   
   if (Length != DefaultText){
@@ -70,5 +74,14 @@ FilterHLData <- function(HL, Year, Survey, Species, Haul, Sex, Length){
   
   HLoutput
 
+}
+
+NAsAsMinus9 <- function (myList){
+  
+  myList <- as.character(myList)
+  myList[is.na(myList)]<-"-9"
+  myList <- as.factor(myList)
+  myList
+  
 }
 
