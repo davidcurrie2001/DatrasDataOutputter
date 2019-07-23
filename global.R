@@ -40,9 +40,13 @@ saveDatras <- function(HHtoSave, HLtoSave, CAtoSave, filename){
    
 }
 
-FilterHLData <- function(HL, Survey, Species, Haul, Sex, Length){
+FilterHLData <- function(HL, Year, Survey, Species, Haul, Sex, Length){
   
   HLoutput <- HL
+  
+  if (Year != DefaultText){
+    HLoutput <- HLoutput[HLoutput$Year == Year,]
+  }
   
   if (Survey != DefaultText){
     HLoutput <- HLoutput[HLoutput$Survey == Survey,]
@@ -68,17 +72,3 @@ FilterHLData <- function(HL, Survey, Species, Haul, Sex, Length){
 
 }
 
-IncrementHLLength <- function(HL, Survey, Species, Haul, Sex, Length){
-  
-  success= FALSE
-  
-  if (Survey==DefaultText | Species==DefaultText | Haul == DefaultText | Sex == DefaultText){
-    success = FALSE
-  } else {
-    
-  }
-  
-  
-  success
-  
-}
